@@ -110,7 +110,7 @@ private:
 	// global search state
 	unsigned char _rom[8];
 	uint8_t _last_discrepancy;
-	uint8_t _Last_family_discrepancy;
+	uint8_t _last_family_discrepancy;
 	uint8_t _last_device_flag;
 #endif
 
