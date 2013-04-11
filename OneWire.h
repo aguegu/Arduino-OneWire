@@ -92,7 +92,7 @@
 #define PIN_TO_BITMASK(pin)             (digitalPinToBitMask(pin))
 #define IO_REG_TYPE uint32_t
 #define IO_REG_ASM
-#define DIRECT_READ(base, mask)         (((*(base+4)) & (mask)) ? 1 : 0)  //PORTX + 0x10
+#define DIRECT_READ(base, mask)         ((*(base+4)) & (mask))  		  //PORTX + 0x10
 #define DIRECT_MODE_INPUT(base, mask)   ((*(base+2)) = (mask))            //TRISXSET + 0x08
 #define DIRECT_MODE_OUTPUT(base, mask)  ((*(base+1)) = (mask))            //TRISXCLR + 0x04
 #define DIRECT_WRITE_LOW(base, mask)    ((*(base+8+1)) = (mask))          //LATXCLR  + 0x24
@@ -103,15 +103,15 @@
 
 class OneWire {
 private:
-	IO_REG_TYPE bitmask;
-	volatile IO_REG_TYPE *baseReg;
+	const IO_REG_TYPE _mask;
+	volatile IO_REG_TYPE * const _reg;
 
 #if ONEWIRE_SEARCH
 	// global search state
-	unsigned char ROM_NO[8];
-	uint8_t LastDiscrepancy;
-	uint8_t LastFamilyDiscrepancy;
-	uint8_t LastDeviceFlag;
+	unsigned char _rom[8];
+	uint8_t _last_discrepancy;
+	uint8_t _Last_family_discrepancy;
+	uint8_t _last_device_flag;
 #endif
 
 public:
