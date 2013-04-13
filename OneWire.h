@@ -130,12 +130,12 @@ public:
 	// for eventually depowering it by calling depower() or doing
 	// another read or write.
 	void write(uint8_t v, bool power = false);
-	void write_bytes(const uint8_t *buf, uint16_t count, bool power = false);
+	void write_bytes(const uint8_t *buf, uint8_t count, bool power = false);
 
 	// Read a byte.
 	uint8_t read(void);
 
-	void read_bytes(uint8_t *buf, uint16_t count);
+	void read_bytes(uint8_t *buf, uint8_t count);
 
 	// Write a bit. The bus is always left powered at the end, see
 	// note in write() about that.
