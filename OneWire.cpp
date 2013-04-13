@@ -130,33 +130,33 @@ OneWire::OneWire(uint8_t pin) :
 //
 // Returns 1 if a device asserted a presence pulse, 0 otherwise.
 //
-uint8_t OneWire::reset(void) {
-	//volatile IO_REG_TYPE *reg IO_REG_ASM = baseReg;
-	uint8_t r;
-	uint8_t retries = 125;
+bool OneWire::reset(void) {
 
 	noInterrupts();
 	DIRECT_MODE_INPUT(_reg, _mask);
 	interrupts();
+
 	// wait until the wire is high... just in case
-	do {
-		if (--retries == 0)
-			return 0;
+	uint8_t retries = 125;
+	while (!DIRECT_READ(_reg, _mask) && --retries)
 		delayMicroseconds(2);
-	} while (!DIRECT_READ(_reg, _mask));
+
+	if (!retries)
+		return 0;
 
 	noInterrupts();
 	DIRECT_WRITE_LOW(_reg, _mask);
 	DIRECT_MODE_OUTPUT(_reg, _mask);
-	// drive output low
 	interrupts();
 	delayMicroseconds(480);
+
 	noInterrupts();
 	DIRECT_MODE_INPUT(_reg, _mask);
-	// allow it to float
-	delayMicroseconds(70);
-	r = !DIRECT_READ(_reg, _mask);
 	interrupts();
+
+	delayMicroseconds(70);
+	bool r = DIRECT_READ(_reg, _mask);
+
 	delayMicroseconds(410);
 	return r;
 }
@@ -291,7 +291,7 @@ void OneWire::depower() {
 void OneWire::reset_search() {
 	// reset the search state
 	_last_discrepancy = 0;
-	_last_device_flag = FALSE;
+	_last_device_flag = false;
 	_last_family_discrepancy = 0;
 	memset(_rom, 0, 8);
 }
@@ -305,7 +305,7 @@ void OneWire::target_search(uint8_t family_code) {
 	_rom[0] = family_code;
 	_last_discrepancy = 64;
 	_last_family_discrepancy = 0;
-	_last_device_flag = FALSE;
+	_last_device_flag = false;
 }
 
 //
@@ -341,12 +341,12 @@ uint8_t OneWire::search(uint8_t *newAddr) {
 	// if the last call was not the last one
 	if (!_last_device_flag) {
 		// 1-Wire reset
-		if (!reset()) {
+		if (reset()) {
 			// reset the search
 			_last_discrepancy = 0;
-			_last_device_flag = FALSE;
+			_last_device_flag = false;
 			_last_family_discrepancy = 0;
-			return FALSE;
+			return false;
 		}
 
 		// issue the search command
@@ -415,18 +415,18 @@ uint8_t OneWire::search(uint8_t *newAddr) {
 
 			// check for last device
 			if (_last_discrepancy == 0)
-				_last_device_flag = TRUE;
+				_last_device_flag = true;
 
-			search_result = TRUE;
+			search_result = true;
 		}
 	}
 
 	// if no device found then reset counters so next 'search' will be like a first
 	if (!search_result || !_rom[0]) {
 		_last_discrepancy = 0;
-		_last_device_flag = FALSE;
+		_last_device_flag = false;
 		_last_family_discrepancy = 0;
-		search_result = FALSE;
+		search_result = false;
 	}
 
 	memcpy(newAddr, _rom, 8);

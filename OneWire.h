@@ -39,9 +39,6 @@
 #define ONEWIRE_CRC16 1
 #endif
 
-#define FALSE 0
-#define TRUE  1
-
 // Platform specific I/O definitions
 
 #if defined(__AVR__)
@@ -117,10 +114,10 @@ private:
 public:
 	OneWire(uint8_t pin);
 
-	// Perform a 1-Wire reset cycle. Returns 1 if a device responds
+	// Perform a 1-Wire reset cycle. Returns  if a device responds
 	// with a presence pulse.  Returns 0 if there is no device or the
 	// bus is shorted or otherwise held low for more than 250uS
-	uint8_t reset(void);
+	bool reset(void);
 
 	// Issue a 1-Wire rom select command, you do the reset first.
 	void select(const uint8_t rom[8]);
