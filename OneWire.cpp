@@ -178,16 +178,16 @@ void OneWire::write_bit(bool v) {
 //
 bool OneWire::read_bit(void) {
 
-	DIRECT_MODE_OUTPUT(_reg, _mask);
 	DIRECT_WRITE_LOW(_reg, _mask);
+	DIRECT_MODE_OUTPUT(_reg, _mask);
 	delayMicroseconds(2);
 
 	DIRECT_MODE_INPUT(_reg, _mask);
 	// let pin float, pull up will raise
 
-	delayMicroseconds(20);
+	delayMicroseconds(10);
 	bool r = DIRECT_READ(_reg, _mask);
-	delayMicroseconds(40);
+	delayMicroseconds(50);
 	return r;
 }
 
@@ -198,15 +198,13 @@ bool OneWire::read_bit(void) {
 // go tri-state at the end of the write to avoid heating in a short or
 // other mishap.
 //
-void OneWire::write(uint8_t v, uint8_t power /* = 0 */) {
+void OneWire::write(uint8_t v, bool power /* = 0 */) {
 	for (uint8_t bitMask = 0x01; bitMask; bitMask <<= 1) {
 		OneWire::write_bit(bitMask & v);
 	}
 	if (!power) {
-		noInterrupts();
 		DIRECT_MODE_INPUT(_reg, _mask);
 		DIRECT_WRITE_LOW(_reg, _mask);
-		interrupts();
 	}
 }
 
@@ -215,10 +213,8 @@ void OneWire::write_bytes(const uint8_t *buf, uint16_t count,
 	for (uint16_t i = 0; i < count; i++)
 		write(buf[i]);
 	if (!power) {
-		noInterrupts();
 		DIRECT_MODE_INPUT(_reg, _mask);
 		DIRECT_WRITE_LOW(_reg, _mask);
-		interrupts();
 	}
 }
 
@@ -270,8 +266,8 @@ void OneWire::depower() {
 void OneWire::reset_search() {
 	// reset the search state
 	_last_discrepancy = 0;
-	_last_device_flag = false;
 	_last_family_discrepancy = 0;
+	_last_device_flag = false;
 	memset(_rom, 0, 8);
 }
 
@@ -280,11 +276,11 @@ void OneWire::reset_search() {
 //
 void OneWire::target_search(uint8_t family_code) {
 	// set the search state to find SearchFamily type devices
-	memset(_rom, 0, 8);
-	_rom[0] = family_code;
 	_last_discrepancy = 64;
 	_last_family_discrepancy = 0;
 	_last_device_flag = false;
+	memset(_rom, 0, 8);
+	_rom[0] = family_code;
 }
 
 //

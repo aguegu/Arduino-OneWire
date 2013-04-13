@@ -105,7 +105,7 @@ private:
 
 #if ONEWIRE_SEARCH
 	// global search state
-	unsigned char _rom[8];
+	uint8_t _rom[8];
 	uint8_t _last_discrepancy;
 	uint8_t _last_family_discrepancy;
 	bool _last_device_flag;
@@ -129,9 +129,8 @@ public:
 	// the end for parasitically powered devices. You are responsible
 	// for eventually depowering it by calling depower() or doing
 	// another read or write.
-	void write(uint8_t v, uint8_t power = 0);
-
-	void write_bytes(const uint8_t *buf, uint16_t count, bool power = 0);
+	void write(uint8_t v, bool power = false);
+	void write_bytes(const uint8_t *buf, uint16_t count, bool power = false);
 
 	// Read a byte.
 	uint8_t read(void);
