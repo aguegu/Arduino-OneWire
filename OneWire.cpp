@@ -163,7 +163,7 @@ void OneWire::write_bit(bool v) {
 
 	DIRECT_WRITE_LOW(_reg, _mask);
 	DIRECT_MODE_OUTPUT(_reg, _mask);
-	delayMicroseconds(3);
+	delayMicroseconds(2);
 
 	if (v)
 		DIRECT_MODE_INPUT(_reg, _mask);
@@ -176,20 +176,18 @@ void OneWire::write_bit(bool v) {
 // Read a bit. Port and bit is used to cut lookup time and provide
 // more certain timing.
 //
-uint8_t OneWire::read_bit(void) {
-//	volatile IO_REG_TYPE *reg IO_REG_ASM = baseReg;
-	uint8_t r;
+bool OneWire::read_bit(void) {
 
-	noInterrupts();
 	DIRECT_MODE_OUTPUT(_reg, _mask);
 	DIRECT_WRITE_LOW(_reg, _mask);
-	delayMicroseconds(3);
+	delayMicroseconds(2);
+
 	DIRECT_MODE_INPUT(_reg, _mask);
 	// let pin float, pull up will raise
-	delayMicroseconds(10);
-	r = DIRECT_READ(_reg, _mask);
-	interrupts();
-	delayMicroseconds(53);
+
+	delayMicroseconds(20);
+	bool r = DIRECT_READ(_reg, _mask);
+	delayMicroseconds(40);
 	return r;
 }
 
@@ -202,7 +200,7 @@ uint8_t OneWire::read_bit(void) {
 //
 void OneWire::write(uint8_t v, uint8_t power /* = 0 */) {
 	for (uint8_t bitMask = 0x01; bitMask; bitMask <<= 1) {
-		OneWire::write_bit((bitMask & v) ? 1 : 0);
+		OneWire::write_bit(bitMask & v);
 	}
 	if (!power) {
 		noInterrupts();

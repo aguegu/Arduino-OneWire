@@ -143,7 +143,7 @@ public:
 	void write_bit(bool v);
 
 	// Read a bit.
-	uint8_t read_bit(void);
+	bool read_bit(void);
 
 	// Stop forcing power onto the bus. You only need to do this if
 	// you used the 'power' flag to write() or used a write_bit() call
