@@ -108,7 +108,7 @@ private:
 	unsigned char _rom[8];
 	uint8_t _last_discrepancy;
 	uint8_t _last_family_discrepancy;
-	uint8_t _last_device_flag;
+	bool _last_device_flag;
 #endif
 
 public:
@@ -140,7 +140,7 @@ public:
 
 	// Write a bit. The bus is always left powered at the end, see
 	// note in write() about that.
-	void write_bit(uint8_t v);
+	void write_bit(bool v);
 
 	// Read a bit.
 	uint8_t read_bit(void);

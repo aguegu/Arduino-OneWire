@@ -132,9 +132,7 @@ OneWire::OneWire(uint8_t pin) :
 //
 bool OneWire::reset(void) {
 
-	noInterrupts();
 	DIRECT_MODE_INPUT(_reg, _mask);
-	interrupts();
 
 	// wait until the wire is high... just in case
 	uint8_t retries = 125;
@@ -142,17 +140,13 @@ bool OneWire::reset(void) {
 		delayMicroseconds(2);
 
 	if (!retries)
-		return 0;
+		return false;
 
-	noInterrupts();
 	DIRECT_WRITE_LOW(_reg, _mask);
 	DIRECT_MODE_OUTPUT(_reg, _mask);
-	interrupts();
 	delayMicroseconds(480);
 
-	noInterrupts();
 	DIRECT_MODE_INPUT(_reg, _mask);
-	interrupts();
 
 	delayMicroseconds(70);
 	bool r = DIRECT_READ(_reg, _mask);
@@ -165,30 +159,17 @@ bool OneWire::reset(void) {
 // Write a bit. Port and bit is used to cut lookup time and provide
 // more certain timing.
 //
-void OneWire::write_bit(uint8_t v) {
-	//volatile IO_REG_TYPE *reg IO_REG_ASM = baseReg;
+void OneWire::write_bit(bool v) {
 
-	if (v) {
-		noInterrupts();
-		DIRECT_WRITE_LOW(_reg, _mask);
-		DIRECT_MODE_OUTPUT(_reg, _mask);
-		// drive output low
-		delayMicroseconds(10);
-		DIRECT_WRITE_HIGH(_reg, _mask);
-		// drive output high
-		interrupts();
-		delayMicroseconds(55);
-	} else {
-		noInterrupts();
-		DIRECT_WRITE_LOW(_reg, _mask);
-		DIRECT_MODE_OUTPUT(_reg, _mask);
-		// drive output low
-		delayMicroseconds(65);
-		DIRECT_WRITE_HIGH(_reg, _mask);
-		// drive output high
-		interrupts();
-		delayMicroseconds(5);
-	}
+	DIRECT_WRITE_LOW(_reg, _mask);
+	DIRECT_MODE_OUTPUT(_reg, _mask);
+	delayMicroseconds(3);
+
+	if (v)
+		DIRECT_MODE_INPUT(_reg, _mask);
+
+	delayMicroseconds(60);
+	DIRECT_MODE_INPUT(_reg, _mask);
 }
 
 //
